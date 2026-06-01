@@ -1,6 +1,13 @@
 import type { Database } from '@/lib/supabase/database.types';
 
 export type RequestRow = Database['public']['Tables']['requests']['Row'];
+export type RequestWithRequester = RequestRow & {
+  requester: {
+    id: string;
+    full_name: string;
+    role: Database['public']['Enums']['app_role'];
+  } | null;
+};
 export type RequestInsert = Database['public']['Tables']['requests']['Insert'];
 export type RequestUpdate = Database['public']['Tables']['requests']['Update'];
 export type RequestStatus = Database['public']['Enums']['request_status'];
@@ -15,7 +22,7 @@ export type RequestFilters = {
 };
 
 export type PaginatedRequests = {
-  data: RequestRow[];
+  data: RequestWithRequester[];
   count: number;
 };
 

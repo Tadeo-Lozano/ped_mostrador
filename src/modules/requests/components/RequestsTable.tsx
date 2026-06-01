@@ -20,21 +20,25 @@ import TableRow from '@mui/material/TableRow';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
-import type { RequestFilters, RequestRow, RequestStatus } from '../types';
+import type {
+  RequestFilters,
+  RequestStatus,
+  RequestWithRequester,
+} from '../types';
 import { RequestPriorityChip } from './RequestPriorityChip';
 import { RequestStatusChip } from './RequestStatusChip';
 
 type TableMode = 'mine' | 'operational';
 
 type RequestsTableProps = {
-  requests: RequestRow[];
+  requests: RequestWithRequester[];
   count: number;
   filters: RequestFilters;
   isLoading: boolean;
   error: string | null;
   mode: TableMode;
   onFiltersChange: (filters: RequestFilters) => void;
-  onStatusChange?: (request: RequestRow, status: RequestStatus) => void;
+  onStatusChange?: (request: RequestWithRequester, status: RequestStatus) => void;
 };
 
 function formatDate(value: string | null) {
@@ -53,7 +57,7 @@ function ActionsCell({
   request,
   onStatusChange,
 }: Pick<RequestsTableProps, 'mode' | 'onStatusChange'> & {
-  request: RequestRow;
+  request: RequestWithRequester;
 }) {
   if (!onStatusChange) {
     return null;
@@ -161,10 +165,11 @@ export function RequestsTable({
       }}
     >
       <TableContainer>
-        <Table sx={{ minWidth: 900 }} aria-label="Solicitudes">
+        <Table sx={{ minWidth: 1050 }} aria-label="Solicitudes">
           <TableHead>
             <TableRow>
               <TableCell>Codigo</TableCell>
+              <TableCell>Solicitante</TableCell>
               <TableCell>Descripcion</TableCell>
               <TableCell align="right">Cantidad</TableCell>
               <TableCell>Prioridad</TableCell>
@@ -177,7 +182,7 @@ export function RequestsTable({
           <TableBody>
             {isLoading && (
               <TableRow>
-                <TableCell colSpan={8}>
+                <TableCell colSpan={9}>
                   <Stack alignItems="center" spacing={2} sx={{ py: 5 }}>
                     <CircularProgress size={28} />
                     <Typography color="text.secondary">
@@ -190,7 +195,7 @@ export function RequestsTable({
 
             {!isLoading && requests.length === 0 && (
               <TableRow>
-                <TableCell colSpan={8}>
+                <TableCell colSpan={9}>
                   <Box sx={{ py: 6, textAlign: 'center' }}>
                     <Typography fontWeight={700}>Sin solicitudes</Typography>
                     <Typography color="text.secondary">
@@ -206,6 +211,16 @@ export function RequestsTable({
                 <TableRow key={request.id} hover>
                   <TableCell>
                     <Typography fontWeight={800}>{request.part_code}</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Stack spacing={0.25}>
+                      <Typography fontWeight={700}>
+                        {request.requester?.full_name ?? '-'}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {request.requester?.role ?? 'solicitante'}
+                      </Typography>
+                    </Stack>
                   </TableCell>
                   <TableCell>{request.part_description ?? '-'}</TableCell>
                   <TableCell align="right">{request.quantity}</TableCell>

@@ -5,6 +5,7 @@ import type {
   RequestFilters,
   RequestRow,
   RequestStatus,
+  RequestWithRequester,
   UpdateRequestStatusInput,
 } from '../types';
 
@@ -14,6 +15,15 @@ function getRange(filters: RequestFilters) {
 
   return { from, to };
 }
+
+const REQUEST_WITH_REQUESTER_SELECT = `
+  *,
+  requester:profiles!requests_requester_id_fkey (
+    id,
+    full_name,
+    role
+  )
+`;
 
 export async function createRequest(
   requesterId: string,
@@ -46,7 +56,7 @@ export async function listMyRequests(
   const { from, to } = getRange(filters);
   let query = supabase
     .from('requests')
-    .select('*', { count: 'exact' })
+    .select(REQUEST_WITH_REQUESTER_SELECT, { count: 'exact' })
     .eq('requester_id', requesterId);
 
   if (filters.status && filters.status !== 'all') {
@@ -74,7 +84,7 @@ export async function listMyRequests(
   }
 
   return {
-    data: data ?? [],
+    data: (data ?? []) as RequestWithRequester[],
     count: count ?? 0,
   };
 }
@@ -85,7 +95,7 @@ export async function listOperationalRequests(
   const { from, to } = getRange(filters);
   let query = supabase
     .from('requests')
-    .select('*', { count: 'exact' })
+    .select(REQUEST_WITH_REQUESTER_SELECT, { count: 'exact' })
     .in('status', ['pendiente', 'en_proceso', 'surtida', 'no_encontrada']);
 
   if (filters.status && filters.status !== 'all') {
@@ -113,7 +123,7 @@ export async function listOperationalRequests(
   }
 
   return {
-    data: data ?? [],
+    data: (data ?? []) as RequestWithRequester[],
     count: count ?? 0,
   };
 }
