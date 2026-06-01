@@ -1,0 +1,71 @@
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import { useState } from 'react';
+
+import type { RequestRow, RequestStatus } from '../types';
+
+type RequestStatusDialogProps = {
+  request: RequestRow | null;
+  nextStatus: RequestStatus | null;
+  isSaving: boolean;
+  onClose: () => void;
+  onConfirm: (comment: string) => Promise<void>;
+};
+
+export function RequestStatusDialog({
+  request,
+  nextStatus,
+  isSaving,
+  onClose,
+  onConfirm,
+}: RequestStatusDialogProps) {
+  const [comment, setComment] = useState('');
+  const isOpen = Boolean(request && nextStatus);
+
+  async function handleConfirm() {
+    await onConfirm(comment);
+    setComment('');
+  }
+
+  function handleClose() {
+    setComment('');
+    onClose();
+  }
+
+  return (
+    <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="sm">
+      <DialogTitle>Cambiar estado</DialogTitle>
+      <DialogContent>
+        <Stack spacing={2} sx={{ pt: 1 }}>
+          <Typography color="text.secondary">
+            {request
+              ? `Solicitud ${request.part_code} cambiara a ${nextStatus?.replace('_', ' ')}.`
+              : ''}
+          </Typography>
+          <TextField
+            label="Observaciones"
+            value={comment}
+            onChange={(event) => setComment(event.target.value)}
+            multiline
+            minRows={3}
+            fullWidth
+          />
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose} disabled={isSaving}>
+          Volver
+        </Button>
+        <Button variant="contained" onClick={() => void handleConfirm()} disabled={isSaving}>
+          Confirmar
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
