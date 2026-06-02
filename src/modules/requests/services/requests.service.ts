@@ -16,6 +16,14 @@ function getRange(filters: RequestFilters) {
   return { from, to };
 }
 
+const ACTIVE_OPERATIONAL_STATUSES: RequestStatus[] = ['pendiente', 'en_proceso'];
+const CLOSED_OPERATIONAL_STATUSES: RequestStatus[] = [
+  'surtida',
+  'recibida',
+  'no_encontrada',
+  'cancelada',
+];
+
 const REQUEST_WITH_REQUESTER_SELECT = `
   *,
   requester:profiles!requests_requester_id_fkey (
@@ -93,10 +101,14 @@ export async function listOperationalRequests(
   filters: RequestFilters,
 ): Promise<PaginatedRequests> {
   const { from, to } = getRange(filters);
+  const baseStatuses =
+    filters.statusGroup === 'closed'
+      ? CLOSED_OPERATIONAL_STATUSES
+      : ACTIVE_OPERATIONAL_STATUSES;
   let query = supabase
     .from('requests')
     .select(REQUEST_WITH_REQUESTER_SELECT, { count: 'exact' })
-    .in('status', ['pendiente', 'en_proceso', 'surtida', 'no_encontrada']);
+    .in('status', baseStatuses);
 
   if (filters.status && filters.status !== 'all') {
     query = query.eq('status', filters.status);
