@@ -1,6 +1,7 @@
 import AddTaskOutlinedIcon from '@mui/icons-material/AddTaskOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
+import HowToRegOutlinedIcon from '@mui/icons-material/HowToRegOutlined';
 import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
@@ -34,6 +35,7 @@ const iconsByPath: Record<AppRoutePath, ReactElement> = {
   '/solicitudes/nueva': <AddTaskOutlinedIcon />,
   '/solicitudes/mias': <AssignmentTurnedInOutlinedIcon />,
   '/solicitudes/pendientes': <InboxOutlinedIcon />,
+  '/recepcion': <HowToRegOutlinedIcon />,
   '/historial': <HistoryOutlinedIcon />,
   '/supervisor': <DashboardOutlinedIcon />,
 };

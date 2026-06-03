@@ -10,6 +10,7 @@ export type AppRoutePath =
   | '/solicitudes/nueva'
   | '/solicitudes/mias'
   | '/solicitudes/pendientes'
+  | '/recepcion'
   | '/historial'
   | '/supervisor';
 
@@ -28,6 +29,11 @@ export const routeItems: RouteItem[] = [
     label: 'Pendientes',
     path: '/solicitudes/pendientes',
     roles: ['surtidor', 'supervisor'],
+  },
+  {
+    label: 'Recepcion',
+    path: '/recepcion',
+    roles: ['supervisor'],
   },
   {
     label: 'Historial',

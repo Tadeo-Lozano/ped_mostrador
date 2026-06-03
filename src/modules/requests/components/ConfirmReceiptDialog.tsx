@@ -46,7 +46,7 @@ export function ConfirmReceiptDialog({
         <Stack spacing={2} sx={{ pt: 1 }}>
           <Typography color="text.secondary">
             {request
-              ? `Confirma que recibiste el pedido ${request.part_code}. Esta confirmacion quedara registrada como comprobante digital.`
+              ? `Captura el NIP del solicitante ${request.requester?.full_name ?? ''} para confirmar la entrega del pedido ${request.part_code}. Esta confirmacion quedara registrada como comprobante digital.`
               : ''}
           </Typography>
           <TextField

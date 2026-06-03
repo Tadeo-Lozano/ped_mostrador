@@ -2,6 +2,7 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import DoneAllOutlinedIcon from '@mui/icons-material/DoneAllOutlined';
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
+import HowToRegOutlinedIcon from '@mui/icons-material/HowToRegOutlined';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -19,7 +20,7 @@ type PickerRequestsBoardProps = {
   requests: RequestWithRequester[];
   isLoading: boolean;
   error: string | null;
-  view: 'active' | 'closed';
+  view: 'active' | 'receipt' | 'closed';
   onStatusChange: (request: RequestWithRequester, status: RequestStatus) => void;
 };
 
@@ -244,6 +245,21 @@ function RequestCard({
           </>
         )}
 
+        {view === 'receipt' && (
+          <>
+            <Divider />
+            <Button
+              size="large"
+              variant="contained"
+              startIcon={<HowToRegOutlinedIcon />}
+              onClick={() => onStatusChange(request, 'recibida')}
+              sx={{ minHeight: 52, fontWeight: 900 }}
+            >
+              Confirmar recepcion
+            </Button>
+          </>
+        )}
+
         {view === 'active' && (
           <>
             <Divider />
@@ -290,12 +306,18 @@ export function PickerRequestsBoard({
         }}
       >
         <Typography sx={{ fontSize: 28, fontWeight: 900 }}>
-          {view === 'active' ? 'Sin pedidos abiertos' : 'Sin pedidos anteriores'}
+          {view === 'active'
+            ? 'Sin pedidos abiertos'
+            : view === 'receipt'
+              ? 'Sin pedidos listos'
+              : 'Sin pedidos anteriores'}
         </Typography>
         <Typography color="text.secondary" sx={{ mt: 1 }}>
           {view === 'active'
             ? 'Los pedidos nuevos apareceran aqui automaticamente.'
-            : 'Los pedidos finalizados apareceran aqui.'}
+            : view === 'receipt'
+              ? 'Los pedidos surtidos apareceran aqui para confirmar recepcion.'
+              : 'Los pedidos finalizados apareceran aqui.'}
         </Typography>
       </Paper>
     );

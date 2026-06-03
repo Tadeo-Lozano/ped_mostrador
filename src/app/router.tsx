@@ -6,6 +6,7 @@ import { RoleRedirect } from '@/modules/auth/components/RoleRedirect';
 import { CreateRequestPage } from '@/modules/requests/pages/CreateRequestPage';
 import { MyRequestsPage } from '@/modules/requests/pages/MyRequestsPage';
 import { PendingRequestsPage } from '@/modules/requests/pages/PendingRequestsPage';
+import { ReceiptTerminalPage } from '@/modules/requests/pages/ReceiptTerminalPage';
 import { MovementsHistoryPage } from '@/modules/movements/pages/MovementsHistoryPage';
 import { SupervisorDashboardPage } from '@/modules/supervisor/pages/SupervisorDashboardPage';
 import { MainLayout } from '@/shared/layouts/MainLayout';
@@ -44,6 +45,11 @@ export const router = createBrowserRouter([
             path: 'solicitudes/pendientes',
             element: <ProtectedRoute allowedRoles={['surtidor', 'supervisor']} />,
             children: [{ index: true, element: <PendingRequestsPage /> }],
+          },
+          {
+            path: 'recepcion',
+            element: <ProtectedRoute allowedRoles={['supervisor']} />,
+            children: [{ index: true, element: <ReceiptTerminalPage /> }],
           },
           {
             path: 'historial',

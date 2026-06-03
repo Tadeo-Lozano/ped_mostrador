@@ -194,6 +194,7 @@ export type Database = {
           request_id: string;
           received_by: string;
           delivered_by: string | null;
+          confirmed_by: string | null;
           method: string;
           confirmed_quantity: number;
           comment: string | null;
@@ -204,6 +205,7 @@ export type Database = {
           request_id: string;
           received_by: string;
           delivered_by?: string | null;
+          confirmed_by?: string | null;
           method?: string;
           confirmed_quantity: number;
           comment?: string | null;
@@ -214,12 +216,20 @@ export type Database = {
           request_id?: string;
           received_by?: string;
           delivered_by?: string | null;
+          confirmed_by?: string | null;
           method?: string;
           confirmed_quantity?: number;
           comment?: string | null;
           created_at?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: 'request_receipts_confirmed_by_fkey';
+            columns: ['confirmed_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
           {
             foreignKeyName: 'request_receipts_delivered_by_fkey';
             columns: ['delivered_by'];

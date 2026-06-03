@@ -17,7 +17,7 @@ export type RequestInsert = Database['public']['Tables']['requests']['Insert'];
 export type RequestUpdate = Database['public']['Tables']['requests']['Update'];
 export type RequestStatus = Database['public']['Enums']['request_status'];
 export type RequestPriority = Database['public']['Enums']['request_priority'];
-export type RequestStatusGroup = 'active' | 'closed';
+export type RequestStatusGroup = 'active' | 'receipt' | 'closed';
 
 export type RequestFilters = {
   status?: RequestStatus | 'all';

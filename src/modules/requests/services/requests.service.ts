@@ -18,8 +18,8 @@ function getRange(filters: RequestFilters) {
 }
 
 const ACTIVE_OPERATIONAL_STATUSES: RequestStatus[] = ['pendiente', 'en_proceso'];
+const RECEIPT_OPERATIONAL_STATUSES: RequestStatus[] = ['surtida'];
 const CLOSED_OPERATIONAL_STATUSES: RequestStatus[] = [
-  'surtida',
   'recibida',
   'no_encontrada',
   'cancelada',
@@ -146,6 +146,8 @@ export async function listOperationalRequests(
   const baseStatuses =
     filters.statusGroup === 'closed'
       ? CLOSED_OPERATIONAL_STATUSES
+      : filters.statusGroup === 'receipt'
+        ? RECEIPT_OPERATIONAL_STATUSES
       : ACTIVE_OPERATIONAL_STATUSES;
   let query = supabase
     .from('requests')
