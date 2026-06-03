@@ -38,6 +38,21 @@ function getRequestNumber(id: string) {
   return id.slice(0, 8).toUpperCase();
 }
 
+function getItemsSummary(request: RequestWithRequester) {
+  if (!request.request_items?.length) {
+    return [
+      {
+        id: request.id,
+        part_code: request.part_code,
+        part_description: request.part_description,
+        quantity: request.quantity,
+      },
+    ];
+  }
+
+  return request.request_items;
+}
+
 function RequestActions({
   request,
   onStatusChange,
@@ -110,6 +125,7 @@ function RequestCard({
   request: RequestWithRequester;
 }) {
   const isCritical = request.priority === 'critica';
+  const items = getItemsSummary(request);
 
   return (
     <Paper
@@ -149,11 +165,13 @@ function RequestCard({
                 wordBreak: 'break-word',
               }}
             >
-              {request.part_code}
+              {items.length === 1
+                ? items[0].part_code
+                : `${items.length} PRODUCTOS`}
             </Typography>
           </Box>
           <Typography sx={{ fontSize: 28, fontWeight: 900 }}>
-            x{request.quantity}
+            x{items.reduce((total, item) => total + item.quantity, 0)}
           </Typography>
         </Stack>
       </Box>
@@ -178,11 +196,40 @@ function RequestCard({
 
         <Box>
           <Typography variant="body2" color="text.secondary" fontWeight={700}>
-            Descripcion
+            Productos
           </Typography>
-          <Typography sx={{ fontSize: 18, fontWeight: 700 }}>
-            {request.part_description ?? 'Sin descripcion'}
-          </Typography>
+          <Stack spacing={1} sx={{ mt: 1 }}>
+            {items.map((item) => (
+              <Box
+                key={item.id}
+                sx={{
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 1.5,
+                  px: 1.5,
+                  py: 1,
+                }}
+              >
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  spacing={2}
+                >
+                  <Box>
+                    <Typography sx={{ fontSize: 20, fontWeight: 900 }}>
+                      {item.part_code}
+                    </Typography>
+                    <Typography color="text.secondary" fontWeight={700}>
+                      {item.part_description ?? 'Sin descripcion'}
+                    </Typography>
+                  </Box>
+                  <Typography sx={{ fontSize: 22, fontWeight: 900 }}>
+                    x{item.quantity}
+                  </Typography>
+                </Stack>
+              </Box>
+            ))}
+          </Stack>
         </Box>
 
         {request.notes && (

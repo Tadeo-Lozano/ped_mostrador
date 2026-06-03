@@ -1,12 +1,17 @@
 import type { Database } from '@/lib/supabase/database.types';
 
 export type RequestRow = Database['public']['Tables']['requests']['Row'];
+export type RequestItemRow = Database['public']['Tables']['request_items']['Row'];
+export type RequestReceiptRow =
+  Database['public']['Tables']['request_receipts']['Row'];
 export type RequestWithRequester = RequestRow & {
   requester: {
     id: string;
     full_name: string;
     role: Database['public']['Enums']['app_role'];
   } | null;
+  request_items: RequestItemRow[];
+  request_receipts?: RequestReceiptRow[];
 };
 export type RequestInsert = Database['public']['Tables']['requests']['Insert'];
 export type RequestUpdate = Database['public']['Tables']['requests']['Update'];
@@ -29,9 +34,11 @@ export type PaginatedRequests = {
 };
 
 export type CreateRequestInput = {
-  partCode: string;
-  partDescription: string;
-  quantity: number;
+  items: Array<{
+    partCode: string;
+    partDescription: string;
+    quantity: number;
+  }>;
   priority: RequestPriority;
   notes: string;
 };
@@ -41,6 +48,12 @@ export type UpdateRequestStatusInput = {
   status: RequestStatus;
   pickerId?: string | null;
   notes?: string;
+};
+
+export type ConfirmRequestReceiptInput = {
+  requestId: string;
+  pin: string;
+  comment?: string;
 };
 
 export const REQUEST_STATUSES: RequestStatus[] = [

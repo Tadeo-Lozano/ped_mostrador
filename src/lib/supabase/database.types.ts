@@ -14,6 +14,7 @@ export type Database = {
           id: string;
           full_name: string;
           role: Database['public']['Enums']['app_role'];
+          receipt_pin_hash: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -21,6 +22,7 @@ export type Database = {
           id: string;
           full_name: string;
           role?: Database['public']['Enums']['app_role'];
+          receipt_pin_hash?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -28,6 +30,7 @@ export type Database = {
           id?: string;
           full_name?: string;
           role?: Database['public']['Enums']['app_role'];
+          receipt_pin_hash?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -144,9 +147,128 @@ export type Database = {
           },
         ];
       };
+      request_items: {
+        Row: {
+          id: string;
+          request_id: string;
+          part_code: string;
+          part_description: string | null;
+          quantity: number;
+          delivered_quantity: number | null;
+          received_quantity: number | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          request_id: string;
+          part_code: string;
+          part_description?: string | null;
+          quantity: number;
+          delivered_quantity?: number | null;
+          received_quantity?: number | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          request_id?: string;
+          part_code?: string;
+          part_description?: string | null;
+          quantity?: number;
+          delivered_quantity?: number | null;
+          received_quantity?: number | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'request_items_request_id_fkey';
+            columns: ['request_id'];
+            isOneToOne: false;
+            referencedRelation: 'requests';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      request_receipts: {
+        Row: {
+          id: string;
+          request_id: string;
+          received_by: string;
+          delivered_by: string | null;
+          method: string;
+          confirmed_quantity: number;
+          comment: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          request_id: string;
+          received_by: string;
+          delivered_by?: string | null;
+          method?: string;
+          confirmed_quantity: number;
+          comment?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          request_id?: string;
+          received_by?: string;
+          delivered_by?: string | null;
+          method?: string;
+          confirmed_quantity?: number;
+          comment?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'request_receipts_delivered_by_fkey';
+            columns: ['delivered_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'request_receipts_received_by_fkey';
+            columns: ['received_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'request_receipts_request_id_fkey';
+            columns: ['request_id'];
+            isOneToOne: false;
+            referencedRelation: 'requests';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      confirm_request_receipt: {
+        Args: {
+          p_request_id: string;
+          p_pin: string;
+          p_comment?: string | null;
+        };
+        Returns: Database['public']['Tables']['requests']['Row'];
+      };
+      create_request_with_items: {
+        Args: {
+          p_priority: Database['public']['Enums']['request_priority'];
+          p_notes: string | null;
+          p_items: Json;
+        };
+        Returns: Database['public']['Tables']['requests']['Row'];
+      };
+      set_my_receipt_pin: {
+        Args: {
+          pin: string;
+        };
+        Returns: undefined;
+      };
+    };
     Enums: {
       app_role: 'solicitante' | 'surtidor' | 'supervisor';
       request_status:

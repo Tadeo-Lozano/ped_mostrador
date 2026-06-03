@@ -52,6 +52,21 @@ function formatDate(value: string | null) {
   }).format(new Date(value));
 }
 
+function getItemsSummary(request: RequestWithRequester) {
+  if (!request.request_items?.length) {
+    return [
+      {
+        id: request.id,
+        part_code: request.part_code,
+        part_description: request.part_description,
+        quantity: request.quantity,
+      },
+    ];
+  }
+
+  return request.request_items;
+}
+
 function ActionsCell({
   mode,
   request,
@@ -168,7 +183,7 @@ export function RequestsTable({
         <Table sx={{ minWidth: 1050 }} aria-label="Solicitudes">
           <TableHead>
             <TableRow>
-              <TableCell>Codigo</TableCell>
+              <TableCell>Productos</TableCell>
               <TableCell>Solicitante</TableCell>
               <TableCell>Descripcion</TableCell>
               <TableCell align="right">Cantidad</TableCell>
@@ -210,7 +225,21 @@ export function RequestsTable({
               requests.map((request) => (
                 <TableRow key={request.id} hover>
                   <TableCell>
-                    <Typography fontWeight={800}>{request.part_code}</Typography>
+                    <Stack spacing={0.75}>
+                      {getItemsSummary(request).map((item) => (
+                        <Box key={item.id}>
+                          <Typography fontWeight={800}>
+                            {item.part_code}{' '}
+                            <Typography component="span" color="text.secondary">
+                              x{item.quantity}
+                            </Typography>
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {item.part_description ?? '-'}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Stack>
                   </TableCell>
                   <TableCell>
                     <Stack spacing={0.25}>
@@ -222,7 +251,11 @@ export function RequestsTable({
                       </Typography>
                     </Stack>
                   </TableCell>
-                  <TableCell>{request.part_description ?? '-'}</TableCell>
+                  <TableCell>
+                    {request.request_items?.length > 1
+                      ? `${request.request_items.length} productos`
+                      : request.part_description ?? '-'}
+                  </TableCell>
                   <TableCell align="right">{request.quantity}</TableCell>
                   <TableCell>
                     <RequestPriorityChip priority={request.priority} />

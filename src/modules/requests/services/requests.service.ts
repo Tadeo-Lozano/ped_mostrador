@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase/client';
 import type {
   CreateRequestInput,
+  ConfirmRequestReceiptInput,
   PaginatedRequests,
   RequestFilters,
   RequestRow,
@@ -30,31 +31,72 @@ const REQUEST_WITH_REQUESTER_SELECT = `
     id,
     full_name,
     role
+  ),
+  request_items (
+    id,
+    request_id,
+    part_code,
+    part_description,
+    quantity,
+    delivered_quantity,
+    received_quantity,
+    created_at
+  ),
+  request_receipts (
+    id,
+    request_id,
+    received_by,
+    delivered_by,
+    method,
+    confirmed_quantity,
+    comment,
+    created_at
   )
 `;
 
 export async function createRequest(
-  requesterId: string,
+  _requesterId: string,
   input: CreateRequestInput,
 ): Promise<RequestRow> {
-  const { data, error } = await supabase
-    .from('requests')
-    .insert({
-      requester_id: requesterId,
-      part_code: input.partCode.trim().toUpperCase(),
-      part_description: input.partDescription.trim() || null,
-      quantity: input.quantity,
-      priority: input.priority,
-      notes: input.notes.trim() || null,
-    })
-    .select('*')
-    .single();
+  const { data, error } = await supabase.rpc('create_request_with_items', {
+    p_priority: input.priority,
+    p_notes: input.notes.trim() || null,
+    p_items: input.items,
+  });
 
   if (error) {
     throw error;
   }
 
   return data;
+}
+
+export async function confirmRequestReceipt({
+  requestId,
+  pin,
+  comment,
+}: ConfirmRequestReceiptInput): Promise<RequestRow> {
+  const { data, error } = await supabase.rpc('confirm_request_receipt', {
+    p_request_id: requestId,
+    p_pin: pin,
+    p_comment: comment?.trim() || null,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+export async function setMyReceiptPin(pin: string): Promise<void> {
+  const { error } = await supabase.rpc('set_my_receipt_pin', {
+    pin,
+  });
+
+  if (error) {
+    throw error;
+  }
 }
 
 export async function listMyRequests(
