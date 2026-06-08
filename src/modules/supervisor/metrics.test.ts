@@ -18,6 +18,9 @@ function request(overrides: Partial<RequestRow>): RequestRow {
     delivered_at: null,
     received_at: null,
     notes: null,
+    warehouse_location: 'arriba',
+    order_group_id: null,
+    picker_employee_number: null,
     ...overrides,
   };
 }

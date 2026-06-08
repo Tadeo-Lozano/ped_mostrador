@@ -18,12 +18,14 @@ export type RequestUpdate = Database['public']['Tables']['requests']['Update'];
 export type RequestStatus = Database['public']['Enums']['request_status'];
 export type RequestPriority = Database['public']['Enums']['request_priority'];
 export type RequestStatusGroup = 'active' | 'receipt' | 'closed';
+export type WarehouseLocation = 'arriba' | 'abajo';
 
 export type RequestFilters = {
   status?: RequestStatus | 'all';
   priority?: RequestPriority | 'all';
   search?: string;
   statusGroup?: RequestStatusGroup;
+  warehouseLocation?: WarehouseLocation | 'all';
   page: number;
   pageSize: number;
 };
@@ -38,6 +40,7 @@ export type CreateRequestInput = {
     partCode: string;
     partDescription: string;
     quantity: number;
+    warehouseLocation: WarehouseLocation;
   }>;
   priority: RequestPriority;
   notes: string;
@@ -47,6 +50,7 @@ export type UpdateRequestStatusInput = {
   requestId: string;
   status: RequestStatus;
   pickerId?: string | null;
+  pickerEmployeeNumber?: string;
   notes?: string;
 };
 
@@ -70,3 +74,10 @@ export const REQUEST_PRIORITIES: RequestPriority[] = [
   'urgente',
   'critica',
 ];
+
+export const WAREHOUSE_LOCATIONS: WarehouseLocation[] = ['arriba', 'abajo'];
+
+export const WAREHOUSE_LABELS: Record<WarehouseLocation, string> = {
+  arriba: 'Almacen arriba',
+  abajo: 'Almacen abajo',
+};

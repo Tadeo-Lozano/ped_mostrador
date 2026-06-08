@@ -13,6 +13,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 import type { RequestStatus, RequestWithRequester } from '../types';
+import { WAREHOUSE_LABELS } from '../types';
 import { RequestPriorityChip } from './RequestPriorityChip';
 import { RequestStatusChip } from './RequestStatusChip';
 
@@ -47,6 +48,7 @@ function getItemsSummary(request: RequestWithRequester) {
         part_code: request.part_code,
         part_description: request.part_description,
         quantity: request.quantity,
+        warehouse_location: request.warehouse_location ?? 'arriba',
       },
     ];
   }
@@ -181,10 +183,26 @@ function RequestCard({
         <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
           <RequestStatusChip status={request.status} />
           <RequestPriorityChip priority={request.priority} />
+          {request.warehouse_location && (
+            <Typography color="text.secondary" sx={{ fontWeight: 800 }}>
+              {WAREHOUSE_LABELS[request.warehouse_location]}
+            </Typography>
+          )}
           <Typography color="text.secondary" sx={{ fontWeight: 700 }}>
             {formatTime(request.created_at)}
           </Typography>
         </Stack>
+
+        {request.picker_employee_number && (
+          <Box>
+            <Typography variant="body2" color="text.secondary" fontWeight={700}>
+              Surtidor
+            </Typography>
+            <Typography sx={{ fontSize: 20, fontWeight: 900 }}>
+              #{request.picker_employee_number}
+            </Typography>
+          </Box>
+        )}
 
         <Box>
           <Typography variant="body2" color="text.secondary" fontWeight={700}>
@@ -222,6 +240,9 @@ function RequestCard({
                     </Typography>
                     <Typography color="text.secondary" fontWeight={700}>
                       {item.part_description ?? 'Sin descripcion'}
+                    </Typography>
+                    <Typography color="text.secondary" fontWeight={800}>
+                      {WAREHOUSE_LABELS[item.warehouse_location]}
                     </Typography>
                   </Box>
                   <Typography sx={{ fontSize: 22, fontWeight: 900 }}>

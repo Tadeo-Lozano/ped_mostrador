@@ -32,6 +32,7 @@ export function useRequests(
   const requesterId = scope.type === 'mine' ? scope.requesterId : undefined;
   const status = filters.status;
   const statusGroup = filters.statusGroup;
+  const warehouseLocation = filters.warehouseLocation;
   const priority = filters.priority;
   const search = filters.search;
   const page = filters.page;
@@ -45,6 +46,7 @@ export function useRequests(
       const currentFilters: RequestFilters = {
         status,
         statusGroup,
+        warehouseLocation,
         priority,
         search,
         page,
@@ -66,7 +68,17 @@ export function useRequests(
     } finally {
       setIsLoading(false);
     }
-  }, [page, pageSize, priority, requesterId, scopeType, search, status, statusGroup]);
+  }, [
+    page,
+    pageSize,
+    priority,
+    requesterId,
+    scopeType,
+    search,
+    status,
+    statusGroup,
+    warehouseLocation,
+  ]);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {

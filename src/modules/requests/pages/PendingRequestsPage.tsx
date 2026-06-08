@@ -27,6 +27,7 @@ const initialFilters: RequestFilters = {
   priority: 'all',
   search: '',
   statusGroup: 'active',
+  warehouseLocation: 'all',
   page: 0,
   pageSize: 50,
 };
@@ -41,9 +42,14 @@ export function PendingRequestsPage() {
   const [snackbar, setSnackbar] = useState<string | null>(null);
   const scope = useMemo(() => ({ type: 'operational' as const }), []);
 
+  const effectiveFilters = {
+    ...filters,
+    warehouseLocation: profile?.warehouse_location ?? filters.warehouseLocation,
+  };
+
   const { requests, count, isLoading, error, refresh } = useRequests(
     scope,
-    filters,
+    effectiveFilters,
   );
   const realtime = useRequestRealtime({
     scope,
@@ -87,7 +93,7 @@ export function PendingRequestsPage() {
     setNextStatus(status);
   }
 
-  async function handleConfirm(comment: string) {
+  async function handleConfirm(comment: string, pickerEmployeeNumber: string) {
     if (!selectedRequest || !nextStatus || !profile) {
       return;
     }
@@ -102,6 +108,10 @@ export function PendingRequestsPage() {
           nextStatus === 'en_proceso' || nextStatus === 'surtida'
             ? profile.id
             : selectedRequest.picker_id,
+        pickerEmployeeNumber:
+          nextStatus === 'en_proceso' || nextStatus === 'surtida'
+            ? pickerEmployeeNumber
+            : selectedRequest.picker_employee_number ?? undefined,
         notes: comment || selectedRequest.notes || undefined,
       });
       setSnackbar('Solicitud actualizada.');
@@ -131,7 +141,9 @@ export function PendingRequestsPage() {
             Tablero de pedidos
           </Typography>
           <Typography color="text.secondary">
-            Vista operativa para pantalla de almacen.
+            Vista operativa para {profile?.warehouse_location
+              ? `almacen ${profile.warehouse_location}`
+              : 'pantalla de almacen'}.
           </Typography>
         </Box>
 

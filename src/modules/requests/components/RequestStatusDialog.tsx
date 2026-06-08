@@ -15,7 +15,7 @@ type RequestStatusDialogProps = {
   nextStatus: RequestStatus | null;
   isSaving: boolean;
   onClose: () => void;
-  onConfirm: (comment: string) => Promise<void>;
+  onConfirm: (comment: string, pickerEmployeeNumber: string) => Promise<void>;
 };
 
 export function RequestStatusDialog({
@@ -26,15 +26,20 @@ export function RequestStatusDialog({
   onConfirm,
 }: RequestStatusDialogProps) {
   const [comment, setComment] = useState('');
+  const [pickerEmployeeNumber, setPickerEmployeeNumber] = useState('');
   const isOpen = Boolean(request && nextStatus);
+  const shouldCapturePickerNumber =
+    nextStatus === 'en_proceso' || nextStatus === 'surtida';
 
   async function handleConfirm() {
-    await onConfirm(comment);
+    await onConfirm(comment, pickerEmployeeNumber);
     setComment('');
+    setPickerEmployeeNumber('');
   }
 
   function handleClose() {
     setComment('');
+    setPickerEmployeeNumber('');
     onClose();
   }
 
@@ -48,6 +53,16 @@ export function RequestStatusDialog({
               ? `Solicitud ${request.part_code} cambiara a ${nextStatus?.replace('_', ' ')}.`
               : ''}
           </Typography>
+          {shouldCapturePickerNumber && (
+            <TextField
+              label="Numero de surtidor"
+              value={pickerEmployeeNumber}
+              onChange={(event) => setPickerEmployeeNumber(event.target.value)}
+              inputProps={{ maxLength: 20 }}
+              fullWidth
+              required
+            />
+          )}
           <TextField
             label="Observaciones"
             value={comment}
@@ -62,7 +77,14 @@ export function RequestStatusDialog({
         <Button onClick={handleClose} disabled={isSaving}>
           Volver
         </Button>
-        <Button variant="contained" onClick={() => void handleConfirm()} disabled={isSaving}>
+        <Button
+          variant="contained"
+          onClick={() => void handleConfirm()}
+          disabled={
+            isSaving ||
+            (shouldCapturePickerNumber && !pickerEmployeeNumber.trim())
+          }
+        >
           Confirmar
         </Button>
       </DialogActions>

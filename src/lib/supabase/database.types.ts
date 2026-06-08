@@ -15,6 +15,7 @@ export type Database = {
           full_name: string;
           role: Database['public']['Enums']['app_role'];
           receipt_pin_hash: string | null;
+          warehouse_location: 'arriba' | 'abajo' | null;
           created_at: string;
           updated_at: string;
         };
@@ -23,6 +24,7 @@ export type Database = {
           full_name: string;
           role?: Database['public']['Enums']['app_role'];
           receipt_pin_hash?: string | null;
+          warehouse_location?: 'arriba' | 'abajo' | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -31,6 +33,7 @@ export type Database = {
           full_name?: string;
           role?: Database['public']['Enums']['app_role'];
           receipt_pin_hash?: string | null;
+          warehouse_location?: 'arriba' | 'abajo' | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -51,6 +54,9 @@ export type Database = {
           delivered_at: string | null;
           received_at: string | null;
           notes: string | null;
+          warehouse_location: 'arriba' | 'abajo' | null;
+          order_group_id: string | null;
+          picker_employee_number: string | null;
         };
         Insert: {
           id?: string;
@@ -66,6 +72,9 @@ export type Database = {
           delivered_at?: string | null;
           received_at?: string | null;
           notes?: string | null;
+          warehouse_location?: 'arriba' | 'abajo' | null;
+          order_group_id?: string | null;
+          picker_employee_number?: string | null;
         };
         Update: {
           id?: string;
@@ -81,6 +90,9 @@ export type Database = {
           delivered_at?: string | null;
           received_at?: string | null;
           notes?: string | null;
+          warehouse_location?: 'arriba' | 'abajo' | null;
+          order_group_id?: string | null;
+          picker_employee_number?: string | null;
         };
         Relationships: [
           {
@@ -156,6 +168,7 @@ export type Database = {
           quantity: number;
           delivered_quantity: number | null;
           received_quantity: number | null;
+          warehouse_location: 'arriba' | 'abajo';
           created_at: string;
         };
         Insert: {
@@ -166,6 +179,7 @@ export type Database = {
           quantity: number;
           delivered_quantity?: number | null;
           received_quantity?: number | null;
+          warehouse_location?: 'arriba' | 'abajo';
           created_at?: string;
         };
         Update: {
@@ -176,6 +190,7 @@ export type Database = {
           quantity?: number;
           delivered_quantity?: number | null;
           received_quantity?: number | null;
+          warehouse_location?: 'arriba' | 'abajo';
           created_at?: string;
         };
         Relationships: [

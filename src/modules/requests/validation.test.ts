@@ -9,6 +9,7 @@ const validForm: RequestFormState = {
       partCode: ' abc-123 ',
       partDescription: 'Filtro de aceite',
       quantity: '2',
+      warehouseLocation: 'arriba',
     },
   ],
   priority: 'normal',

@@ -40,6 +40,7 @@ const REQUEST_WITH_REQUESTER_SELECT = `
     quantity,
     delivered_quantity,
     received_quantity,
+    warehouse_location,
     created_at
   ),
   request_receipts (
@@ -154,6 +155,10 @@ export async function listOperationalRequests(
     .select(REQUEST_WITH_REQUESTER_SELECT, { count: 'exact' })
     .in('status', baseStatuses);
 
+  if (filters.warehouseLocation && filters.warehouseLocation !== 'all') {
+    query = query.eq('warehouse_location', filters.warehouseLocation);
+  }
+
   if (filters.status && filters.status !== 'all') {
     query = query.eq('status', filters.status);
   }
@@ -188,11 +193,13 @@ export async function updateRequestStatus({
   requestId,
   status,
   pickerId,
+  pickerEmployeeNumber,
   notes,
 }: UpdateRequestStatusInput): Promise<RequestRow> {
   const updatePayload: {
     status: RequestStatus;
     picker_id?: string | null;
+    picker_employee_number?: string | null;
     delivered_at?: string | null;
     received_at?: string | null;
     notes?: string | null;
@@ -202,6 +209,11 @@ export async function updateRequestStatus({
 
   if (pickerId !== undefined) {
     updatePayload.picker_id = pickerId;
+  }
+
+  if (pickerEmployeeNumber !== undefined) {
+    updatePayload.picker_employee_number =
+      pickerEmployeeNumber.trim() || null;
   }
 
   if (notes !== undefined) {

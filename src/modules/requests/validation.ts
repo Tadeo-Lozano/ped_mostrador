@@ -1,10 +1,12 @@
-import type { CreateRequestInput, RequestPriority } from './types';
+import type { CreateRequestInput, RequestPriority, WarehouseLocation } from './types';
+import { WAREHOUSE_LOCATIONS } from './types';
 
 export type RequestFormState = {
   items: Array<{
     partCode: string;
     partDescription: string;
     quantity: string;
+    warehouseLocation: WarehouseLocation;
   }>;
   priority: RequestPriority;
   notes: string;
@@ -23,6 +25,7 @@ export function validateCreateRequestForm(
     partCode: item.partCode.trim(),
     partDescription: item.partDescription.trim(),
     quantity: Number(item.quantity),
+    warehouseLocation: item.warehouseLocation,
   }));
 
   if (items.length === 0) {
@@ -54,6 +57,14 @@ export function validateCreateRequestForm(
       return {
         isValid: false,
         error: 'Cada cantidad debe ser un numero entero mayor a cero.',
+        input: null,
+      };
+    }
+
+    if (!WAREHOUSE_LOCATIONS.includes(item.warehouseLocation)) {
+      return {
+        isValid: false,
+        error: 'Selecciona el almacen de cada producto.',
         input: null,
       };
     }

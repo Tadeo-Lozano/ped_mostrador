@@ -25,6 +25,7 @@ import type {
   RequestStatus,
   RequestWithRequester,
 } from '../types';
+import { WAREHOUSE_LABELS } from '../types';
 import { RequestPriorityChip } from './RequestPriorityChip';
 import { RequestStatusChip } from './RequestStatusChip';
 
@@ -60,6 +61,7 @@ function getItemsSummary(request: RequestWithRequester) {
         part_code: request.part_code,
         part_description: request.part_description,
         quantity: request.quantity,
+        warehouse_location: request.warehouse_location ?? 'arriba',
       },
     ];
   }
@@ -236,6 +238,9 @@ export function RequestsTable({
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
                             {item.part_description ?? '-'}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {WAREHOUSE_LABELS[item.warehouse_location]}
                           </Typography>
                         </Box>
                       ))}

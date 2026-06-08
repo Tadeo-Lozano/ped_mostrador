@@ -19,8 +19,8 @@ import { useState } from 'react';
 import { formatError } from '@/lib/errors/formatError';
 import { useAuth } from '@/modules/auth/hooks/useAuth';
 import { createRequest } from '../services/requests.service';
-import type { RequestPriority } from '../types';
-import { REQUEST_PRIORITIES } from '../types';
+import type { RequestPriority, WarehouseLocation } from '../types';
+import { REQUEST_PRIORITIES, WAREHOUSE_LABELS, WAREHOUSE_LOCATIONS } from '../types';
 import { validateCreateRequestForm } from '../validation';
 import type { RequestFormState } from '../validation';
 
@@ -30,6 +30,7 @@ const initialForm: RequestFormState = {
       partCode: '',
       partDescription: '',
       quantity: '1',
+      warehouseLocation: 'arriba',
     },
   ],
   priority: 'normal',
@@ -158,7 +159,12 @@ export function CreateRequestPage() {
                     ...current,
                     items: [
                       ...current.items,
-                      { partCode: '', partDescription: '', quantity: '1' },
+                      {
+                        partCode: '',
+                        partDescription: '',
+                        quantity: '1',
+                        warehouseLocation: 'arriba',
+                      },
                     ],
                   }))
                 }
@@ -196,6 +202,34 @@ export function CreateRequestPage() {
                     fullWidth
                     inputProps={{ maxLength: 80 }}
                   />
+
+                  <FormControl sx={{ minWidth: { md: 180 } }}>
+                    <InputLabel>Almacen</InputLabel>
+                    <Select
+                      label="Almacen"
+                      value={item.warehouseLocation}
+                      onChange={(event) =>
+                        setForm((current) => ({
+                          ...current,
+                          items: current.items.map((currentItem, itemIndex) =>
+                            itemIndex === index
+                              ? {
+                                  ...currentItem,
+                                  warehouseLocation: event.target
+                                    .value as WarehouseLocation,
+                                }
+                              : currentItem,
+                          ),
+                        }))
+                      }
+                    >
+                      {WAREHOUSE_LOCATIONS.map((warehouseLocation) => (
+                        <MenuItem key={warehouseLocation} value={warehouseLocation}>
+                          {WAREHOUSE_LABELS[warehouseLocation]}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
 
                   <TextField
                     label="Cantidad"
