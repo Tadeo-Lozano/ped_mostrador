@@ -60,7 +60,7 @@ export function ReceiptTerminalPage() {
         pin,
         comment,
       });
-      setSnackbar('Recepcion confirmada con NIP.');
+      setSnackbar('Pedido completo confirmado con NIP.');
       setSelectedRequest(null);
       await refresh();
     } catch (receiptError) {

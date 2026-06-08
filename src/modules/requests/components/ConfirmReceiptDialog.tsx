@@ -46,7 +46,7 @@ export function ConfirmReceiptDialog({
         <Stack spacing={2} sx={{ pt: 1 }}>
           <Typography color="text.secondary">
             {request
-              ? `Captura el NIP del solicitante ${request.requester?.full_name ?? ''} para confirmar la entrega del pedido ${request.part_code}. Esta confirmacion quedara registrada como comprobante digital.`
+              ? `Captura el NIP del solicitante ${request.requester?.full_name ?? ''}. Con una sola confirmacion se recibiran todos los productos listos del mismo pedido, aunque vengan de diferentes almacenes.`
               : ''}
           </Typography>
           <TextField
@@ -76,7 +76,7 @@ export function ConfirmReceiptDialog({
           onClick={() => void handleConfirm()}
           disabled={isSaving || pin.length < 4}
         >
-          Confirmar recepcion
+          Confirmar pedido completo
         </Button>
       </DialogActions>
     </Dialog>
