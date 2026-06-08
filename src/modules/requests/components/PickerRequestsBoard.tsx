@@ -14,6 +14,7 @@ import Typography from '@mui/material/Typography';
 
 import type { RequestStatus, RequestWithRequester } from '../types';
 import { WAREHOUSE_LABELS } from '../types';
+import { getRequesterColor } from '../utils/requesterColors';
 import { RequestPriorityChip } from './RequestPriorityChip';
 import { RequestStatusChip } from './RequestStatusChip';
 
@@ -129,13 +130,14 @@ function RequestCard({
 }) {
   const isCritical = request.priority === 'critica';
   const items = getItemsSummary(request);
+  const requesterColor = getRequesterColor(request);
 
   return (
     <Paper
       elevation={0}
       sx={{
         border: '2px solid',
-        borderColor: isCritical ? 'error.main' : 'divider',
+        borderColor: view === 'receipt' ? requesterColor.border : isCritical ? 'error.main' : 'divider',
         borderRadius: 2,
         overflow: 'hidden',
         bgcolor: 'background.paper',
@@ -145,7 +147,12 @@ function RequestCard({
         sx={{
           px: 2.5,
           py: 2,
-          bgcolor: isCritical ? 'error.main' : 'grey.900',
+          bgcolor:
+            view === 'receipt'
+              ? requesterColor.border
+              : isCritical
+                ? 'error.main'
+                : 'grey.900',
           color: 'common.white',
         }}
       >
@@ -204,11 +211,26 @@ function RequestCard({
           </Box>
         )}
 
-        <Box>
+        <Box
+          sx={{
+            border: '2px solid',
+            borderColor: requesterColor.border,
+            borderRadius: 1.5,
+            bgcolor: requesterColor.background,
+            px: 1.5,
+            py: 1.25,
+          }}
+        >
           <Typography variant="body2" color="text.secondary" fontWeight={700}>
             Solicitante
           </Typography>
-          <Typography sx={{ fontSize: 22, fontWeight: 800 }}>
+          <Typography
+            sx={{
+              color: requesterColor.text,
+              fontSize: 24,
+              fontWeight: 900,
+            }}
+          >
             {request.requester?.full_name ?? '-'}
           </Typography>
         </Box>

@@ -14,6 +14,7 @@ import { useRequests } from '../hooks/useRequests';
 import { confirmRequestReceipt } from '../services/requests.service';
 import type { RequestFilters, RequestWithRequester } from '../types';
 import { groupRequestsByOrder } from '../utils/groupRequests';
+import { getRequesterColor } from '../utils/requesterColors';
 
 const initialFilters: RequestFilters = {
   status: 'all',
@@ -39,6 +40,27 @@ export function ReceiptTerminalPage() {
   const groupedRequests = groupRequestsByOrder(requests).filter(
     (request) => request.status === 'surtida',
   );
+  const requesterLegend = groupedRequests
+    .reduce<Array<{ id: string; name: string; color: ReturnType<typeof getRequesterColor> }>>(
+      (legend, request) => {
+        const id = request.requester?.id ?? request.requester_id;
+
+        if (legend.some((item) => item.id === id)) {
+          return legend;
+        }
+
+        return [
+          ...legend,
+          {
+            id,
+            name: request.requester?.full_name ?? 'Sin nombre',
+            color: getRequesterColor(request),
+          },
+        ];
+      },
+      [],
+    )
+    .sort((first, second) => first.name.localeCompare(second.name, 'es-MX'));
 
   const realtime = useRequestRealtime({
     scope,
@@ -127,6 +149,28 @@ export function ReceiptTerminalPage() {
             {groupedRequests.length || count} pedidos
           </Typography>
         </Stack>
+
+        {requesterLegend.length > 0 && (
+          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 2 }}>
+            {requesterLegend.map((requester) => (
+              <Box
+                key={requester.id}
+                sx={{
+                  border: '2px solid',
+                  borderColor: requester.color.border,
+                  borderRadius: 1.5,
+                  bgcolor: requester.color.background,
+                  color: requester.color.text,
+                  px: 1.25,
+                  py: 0.75,
+                  fontWeight: 900,
+                }}
+              >
+                {requester.name}
+              </Box>
+            ))}
+          </Stack>
+        )}
       </Box>
 
       {realtime.error && <Alert severity="warning">{realtime.error}</Alert>}
