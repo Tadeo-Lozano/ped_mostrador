@@ -21,6 +21,7 @@ import {
 import type { RequestFilters, RequestStatus, RequestWithRequester } from '../types';
 import { useRequests } from '../hooks/useRequests';
 import { useRequestRealtime } from '../hooks/useRequestRealtime';
+import { groupRequestsByOrder } from '../utils/groupRequests';
 
 const initialFilters: RequestFilters = {
   status: 'all',
@@ -55,6 +56,7 @@ export function MyRequestsPage() {
     scope,
     filters,
   );
+  const groupedRequests = groupRequestsByOrder(requests);
   const realtime = useRequestRealtime({
     scope,
     enabled: Boolean(profile),
@@ -188,8 +190,8 @@ export function MyRequestsPage() {
       {realtime.error && <Alert severity="warning">{realtime.error}</Alert>}
 
       <RequestsTable
-        requests={requests}
-        count={count}
+        requests={groupedRequests}
+        count={groupedRequests.length || count}
         filters={filters}
         isLoading={isLoading}
         error={error}

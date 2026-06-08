@@ -13,6 +13,7 @@ import { useRequestRealtime } from '../hooks/useRequestRealtime';
 import { useRequests } from '../hooks/useRequests';
 import { confirmRequestReceipt } from '../services/requests.service';
 import type { RequestFilters, RequestWithRequester } from '../types';
+import { groupRequestsByOrder } from '../utils/groupRequests';
 
 const initialFilters: RequestFilters = {
   status: 'all',
@@ -34,6 +35,9 @@ export function ReceiptTerminalPage() {
   const { requests, count, isLoading, error, refresh } = useRequests(
     scope,
     filters,
+  );
+  const groupedRequests = groupRequestsByOrder(requests).filter(
+    (request) => request.status === 'surtida',
   );
 
   const realtime = useRequestRealtime({
@@ -120,7 +124,7 @@ export function ReceiptTerminalPage() {
             Listos para recoger
           </Typography>
           <Typography color="text.secondary" sx={{ fontSize: 18, fontWeight: 700 }}>
-            {count} pedidos
+            {groupedRequests.length || count} pedidos
           </Typography>
         </Stack>
       </Box>
@@ -128,7 +132,7 @@ export function ReceiptTerminalPage() {
       {realtime.error && <Alert severity="warning">{realtime.error}</Alert>}
 
       <PickerRequestsBoard
-        requests={requests}
+        requests={groupedRequests}
         isLoading={isLoading}
         error={error}
         view="receipt"

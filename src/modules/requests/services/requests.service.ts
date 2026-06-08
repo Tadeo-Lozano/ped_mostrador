@@ -18,7 +18,11 @@ function getRange(filters: RequestFilters) {
 }
 
 const ACTIVE_OPERATIONAL_STATUSES: RequestStatus[] = ['pendiente', 'en_proceso'];
-const RECEIPT_OPERATIONAL_STATUSES: RequestStatus[] = ['surtida'];
+const RECEIPT_OPERATIONAL_STATUSES: RequestStatus[] = [
+  'pendiente',
+  'en_proceso',
+  'surtida',
+];
 const CLOSED_OPERATIONAL_STATUSES: RequestStatus[] = [
   'recibida',
   'no_encontrada',
