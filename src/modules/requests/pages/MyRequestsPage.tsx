@@ -110,7 +110,7 @@ export function MyRequestsPage() {
     }
   }
 
-  async function handleReceiptConfirm(pin: string, comment: string) {
+  async function handleReceiptConfirm(pin: string) {
     if (!receiptRequest) {
       return;
     }
@@ -121,7 +121,6 @@ export function MyRequestsPage() {
       await confirmRequestReceipt({
         requestId: receiptRequest.id,
         pin,
-        comment,
       });
       setSnackbar('Recepcion confirmada con NIP.');
       setReceiptRequest(null);

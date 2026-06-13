@@ -14,7 +14,7 @@ type ConfirmReceiptDialogProps = {
   request: RequestWithRequester | null;
   isSaving: boolean;
   onClose: () => void;
-  onConfirm: (pin: string, comment: string) => Promise<void>;
+  onConfirm: (pin: string) => Promise<void>;
 };
 
 export function ConfirmReceiptDialog({
@@ -24,18 +24,15 @@ export function ConfirmReceiptDialog({
   onConfirm,
 }: ConfirmReceiptDialogProps) {
   const [pin, setPin] = useState('');
-  const [comment, setComment] = useState('');
   const isOpen = Boolean(request);
 
   async function handleConfirm() {
-    await onConfirm(pin, comment);
+    await onConfirm(pin);
     setPin('');
-    setComment('');
   }
 
   function handleClose() {
     setPin('');
-    setComment('');
     onClose();
   }
 
@@ -53,16 +50,16 @@ export function ConfirmReceiptDialog({
             label="NIP de recepcion"
             value={pin}
             onChange={(event) => setPin(event.target.value.replace(/\D/g, ''))}
-            inputProps={{ maxLength: 8, inputMode: 'numeric' }}
-            type="password"
-            fullWidth
-          />
-          <TextField
-            label="Comentario opcional"
-            value={comment}
-            onChange={(event) => setComment(event.target.value)}
-            multiline
-            minRows={3}
+            type="text"
+            name="receipt-confirmation-code"
+            autoComplete="off"
+            inputProps={{
+              maxLength: 8,
+              inputMode: 'numeric',
+              pattern: '[0-9]*',
+              'data-1p-ignore': 'true',
+              'data-lpignore': 'true',
+            }}
             fullWidth
           />
         </Stack>

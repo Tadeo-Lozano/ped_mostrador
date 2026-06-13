@@ -129,6 +129,7 @@ function RequestCard({
   request: RequestWithRequester;
 }) {
   const isCritical = request.priority === 'critica';
+  const isReceipt = view === 'receipt';
   const items = getItemsSummary(request);
   const requesterColor = getRequesterColor(request);
 
@@ -137,7 +138,11 @@ function RequestCard({
       elevation={0}
       sx={{
         border: '2px solid',
-        borderColor: view === 'receipt' ? requesterColor.border : isCritical ? 'error.main' : 'divider',
+        borderColor: isReceipt
+          ? requesterColor.border
+          : isCritical
+            ? 'error.main'
+            : 'divider',
         borderRadius: 2,
         overflow: 'hidden',
         bgcolor: 'background.paper',
@@ -145,10 +150,10 @@ function RequestCard({
     >
       <Box
         sx={{
-          px: 2.5,
-          py: 2,
+          px: isReceipt ? 1.5 : 2.5,
+          py: isReceipt ? 1.25 : 2,
           bgcolor:
-            view === 'receipt'
+            isReceipt
               ? requesterColor.border
               : isCritical
                 ? 'error.main'
@@ -163,13 +168,21 @@ function RequestCard({
           spacing={2}
         >
           <Box>
-            <Typography variant="overline" sx={{ opacity: 0.78 }}>
+            <Typography
+              variant="overline"
+              sx={{
+                display: 'block',
+                fontSize: isReceipt ? 10 : undefined,
+                lineHeight: isReceipt ? 1.2 : undefined,
+                opacity: 0.78,
+              }}
+            >
               Pedido #{getRequestNumber(request.id)}
             </Typography>
             <Typography
               component="h2"
               sx={{
-                fontSize: { xs: 28, md: 36 },
+                fontSize: isReceipt ? 20 : { xs: 28, md: 36 },
                 fontWeight: 900,
                 lineHeight: 1.05,
                 wordBreak: 'break-word',
@@ -180,32 +193,53 @@ function RequestCard({
                 : `${items.length} PRODUCTOS`}
             </Typography>
           </Box>
-          <Typography sx={{ fontSize: 28, fontWeight: 900 }}>
+          <Typography
+            sx={{ fontSize: isReceipt ? 20 : 28, fontWeight: 900 }}
+          >
             x{items.reduce((total, item) => total + item.quantity, 0)}
           </Typography>
         </Stack>
       </Box>
 
-      <Stack spacing={2} sx={{ p: 2.5 }}>
-        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+      <Stack spacing={isReceipt ? 1 : 2} sx={{ p: isReceipt ? 1.5 : 2.5 }}>
+        <Stack
+          direction="row"
+          spacing={isReceipt ? 0.75 : 1}
+          flexWrap="wrap"
+          useFlexGap
+          alignItems="center"
+        >
           <RequestStatusChip status={request.status} />
           <RequestPriorityChip priority={request.priority} />
           {request.warehouse_location && (
-            <Typography color="text.secondary" sx={{ fontWeight: 800 }}>
+            <Typography
+              color="text.secondary"
+              sx={{ fontSize: isReceipt ? 12 : undefined, fontWeight: 800 }}
+            >
               {WAREHOUSE_LABELS[request.warehouse_location]}
             </Typography>
           )}
-          <Typography color="text.secondary" sx={{ fontWeight: 700 }}>
+          <Typography
+            color="text.secondary"
+            sx={{ fontSize: isReceipt ? 12 : undefined, fontWeight: 700 }}
+          >
             {formatTime(request.created_at)}
           </Typography>
         </Stack>
 
         {request.picker_employee_number && (
           <Box>
-            <Typography variant="body2" color="text.secondary" fontWeight={700}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              fontWeight={700}
+              sx={{ fontSize: isReceipt ? 11 : undefined }}
+            >
               Surtidor
             </Typography>
-            <Typography sx={{ fontSize: 20, fontWeight: 900 }}>
+            <Typography
+              sx={{ fontSize: isReceipt ? 16 : 20, fontWeight: 900 }}
+            >
               #{request.picker_employee_number}
             </Typography>
           </Box>
@@ -217,18 +251,24 @@ function RequestCard({
             borderColor: requesterColor.border,
             borderRadius: 1.5,
             bgcolor: requesterColor.background,
-            px: 1.5,
-            py: 1.25,
+            px: isReceipt ? 1 : 1.5,
+            py: isReceipt ? 0.75 : 1.25,
           }}
         >
-          <Typography variant="body2" color="text.secondary" fontWeight={700}>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            fontWeight={700}
+            sx={{ fontSize: isReceipt ? 11 : undefined }}
+          >
             Solicitante
           </Typography>
           <Typography
             sx={{
               color: requesterColor.text,
-              fontSize: 24,
+              fontSize: isReceipt ? 18 : 24,
               fontWeight: 900,
+              lineHeight: 1.15,
             }}
           >
             {request.requester?.full_name ?? '-'}
@@ -236,10 +276,15 @@ function RequestCard({
         </Box>
 
         <Box>
-          <Typography variant="body2" color="text.secondary" fontWeight={700}>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            fontWeight={700}
+            sx={{ fontSize: isReceipt ? 11 : undefined }}
+          >
             Productos
           </Typography>
-          <Stack spacing={1} sx={{ mt: 1 }}>
+          <Stack spacing={isReceipt ? 0.5 : 1} sx={{ mt: isReceipt ? 0.5 : 1 }}>
             {items.map((item) => (
               <Box
                 key={item.id}
@@ -247,8 +292,8 @@ function RequestCard({
                   border: '1px solid',
                   borderColor: 'divider',
                   borderRadius: 1.5,
-                  px: 1.5,
-                  py: 1,
+                  px: isReceipt ? 1 : 1.5,
+                  py: isReceipt ? 0.625 : 1,
                 }}
               >
                 <Stack
@@ -257,17 +302,32 @@ function RequestCard({
                   spacing={2}
                 >
                   <Box>
-                    <Typography sx={{ fontSize: 20, fontWeight: 900 }}>
+                    <Typography
+                      sx={{ fontSize: isReceipt ? 16 : 20, fontWeight: 900 }}
+                    >
                       {item.part_code}
                     </Typography>
-                    <Typography color="text.secondary" fontWeight={700}>
+                    <Typography
+                      color="text.secondary"
+                      fontWeight={700}
+                      sx={{
+                        fontSize: isReceipt ? 12 : undefined,
+                        lineHeight: 1.25,
+                      }}
+                    >
                       {item.part_description ?? 'Sin descripcion'}
                     </Typography>
-                    <Typography color="text.secondary" fontWeight={800}>
+                    <Typography
+                      color="text.secondary"
+                      fontWeight={800}
+                      sx={{ fontSize: isReceipt ? 11 : undefined }}
+                    >
                       {WAREHOUSE_LABELS[item.warehouse_location]}
                     </Typography>
                   </Box>
-                  <Typography sx={{ fontSize: 22, fontWeight: 900 }}>
+                  <Typography
+                    sx={{ fontSize: isReceipt ? 17 : 22, fontWeight: 900 }}
+                  >
                     x{item.quantity}
                   </Typography>
                 </Stack>
@@ -280,23 +340,30 @@ function RequestCard({
           <>
             <Divider />
             <Box>
-              <Typography variant="body2" color="text.secondary" fontWeight={700}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                fontWeight={700}
+                sx={{ fontSize: isReceipt ? 11 : undefined }}
+              >
                 Observaciones
               </Typography>
-              <Typography>{request.notes}</Typography>
+              <Typography sx={{ fontSize: isReceipt ? 12 : undefined }}>
+                {request.notes}
+              </Typography>
             </Box>
           </>
         )}
 
-        {view === 'receipt' && (
+        {isReceipt && (
           <>
             <Divider />
             <Button
-              size="large"
+              size="medium"
               variant="contained"
               startIcon={<HowToRegOutlinedIcon />}
               onClick={() => onStatusChange(request, 'recibida')}
-              sx={{ minHeight: 52, fontWeight: 900 }}
+              sx={{ minHeight: 40, fontWeight: 900 }}
             >
               Confirmar recepcion
             </Button>
@@ -310,6 +377,194 @@ function RequestCard({
           </>
         )}
       </Stack>
+    </Paper>
+  );
+}
+
+function RequestRow({
+  request,
+  view,
+  onStatusChange,
+}: Pick<PickerRequestsBoardProps, 'view' | 'onStatusChange'> & {
+  request: RequestWithRequester;
+}) {
+  const items = getItemsSummary(request);
+  const requesterColor = getRequesterColor(request);
+  const isReceipt = view === 'receipt';
+
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        border: '2px solid',
+        borderColor: isReceipt
+          ? requesterColor.border
+          : request.priority === 'critica'
+            ? 'error.main'
+            : 'divider',
+        borderRadius: 1.5,
+        overflow: 'hidden',
+      }}
+    >
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            md: '150px minmax(160px, 0.75fr) minmax(300px, 2fr)',
+            lg: '170px minmax(180px, 0.8fr) minmax(360px, 2.2fr) minmax(260px, auto)',
+          },
+          alignItems: 'stretch',
+        }}
+      >
+        <Box
+          sx={{
+            bgcolor: isReceipt
+              ? requesterColor.border
+              : request.priority === 'critica'
+                ? 'error.main'
+                : 'grey.900',
+            color: 'common.white',
+            px: 1.5,
+            py: 1.25,
+          }}
+        >
+          <Typography
+            variant="overline"
+            sx={{ display: 'block', fontSize: 10, lineHeight: 1.2, opacity: 0.8 }}
+          >
+            Pedido #{getRequestNumber(request.id)}
+          </Typography>
+          <Typography sx={{ fontSize: 20, fontWeight: 900, lineHeight: 1.1 }}>
+            {items.length === 1 ? items[0].part_code : `${items.length} productos`}
+          </Typography>
+          <Typography sx={{ mt: 0.5, fontSize: 14, fontWeight: 800 }}>
+            Total: {items.reduce((total, item) => total + item.quantity, 0)}
+          </Typography>
+          <Typography sx={{ mt: 0.5, fontSize: 12, opacity: 0.85 }}>
+            {formatTime(request.created_at)}
+          </Typography>
+        </Box>
+
+        <Stack
+          spacing={0.75}
+          sx={{
+            borderRight: { md: '1px solid' },
+            borderColor: { md: 'divider' },
+            px: 1.5,
+            py: 1.25,
+          }}
+        >
+          <Box
+            sx={{
+              borderLeft: '5px solid',
+              borderColor: requesterColor.border,
+              bgcolor: requesterColor.background,
+              color: requesterColor.text,
+              px: 1,
+              py: 0.75,
+            }}
+          >
+            <Typography sx={{ fontSize: 11, fontWeight: 700 }}>
+              Solicitante
+            </Typography>
+            <Typography sx={{ fontSize: 18, fontWeight: 900, lineHeight: 1.15 }}>
+              {request.requester?.full_name ?? '-'}
+            </Typography>
+          </Box>
+
+          <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
+            <RequestStatusChip status={request.status} />
+            <RequestPriorityChip priority={request.priority} />
+          </Stack>
+
+          {request.picker_employee_number && (
+            <Typography sx={{ fontSize: 12, fontWeight: 800 }}>
+              Surtidor: #{request.picker_employee_number}
+            </Typography>
+          )}
+        </Stack>
+
+        <Stack
+          spacing={0.5}
+          sx={{
+            borderRight: { lg: '1px solid' },
+            borderColor: { lg: 'divider' },
+            px: 1.5,
+            py: 1.25,
+          }}
+        >
+          {items.map((item) => (
+            <Box
+              key={item.id}
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'minmax(110px, 0.7fr) minmax(130px, 1.5fr) auto',
+                alignItems: 'center',
+                gap: 1,
+                borderBottom: '1px solid',
+                borderColor: 'divider',
+                pb: 0.5,
+                '&:last-of-type': { borderBottom: 0, pb: 0 },
+              }}
+            >
+              <Typography sx={{ fontSize: 16, fontWeight: 900 }}>
+                {item.part_code}
+              </Typography>
+              <Box>
+                <Typography
+                  color="text.secondary"
+                  sx={{ fontSize: 12, fontWeight: 700, lineHeight: 1.2 }}
+                >
+                  {item.part_description ?? 'Sin descripcion'}
+                </Typography>
+                <Typography
+                  color="text.secondary"
+                  sx={{ fontSize: 11, fontWeight: 800 }}
+                >
+                  {WAREHOUSE_LABELS[item.warehouse_location]}
+                </Typography>
+              </Box>
+              <Typography sx={{ fontSize: 17, fontWeight: 900 }}>
+                x{item.quantity}
+              </Typography>
+            </Box>
+          ))}
+
+          {request.notes && (
+            <Typography
+              color="text.secondary"
+              sx={{ pt: 0.5, fontSize: 12, fontWeight: 700 }}
+            >
+              Nota: {request.notes}
+            </Typography>
+          )}
+        </Stack>
+
+        <Stack
+          justifyContent="center"
+          spacing={1}
+          sx={{
+            gridColumn: { xs: '1', md: '1 / -1', lg: 'auto' },
+            borderTop: { xs: '1px solid', lg: 0 },
+            borderColor: 'divider',
+            p: 1.25,
+          }}
+        >
+          {isReceipt ? (
+            <Button
+              variant="contained"
+              startIcon={<HowToRegOutlinedIcon />}
+              onClick={() => onStatusChange(request, 'recibida')}
+              sx={{ minHeight: 42, fontWeight: 900, whiteSpace: 'nowrap' }}
+            >
+              Confirmar recepcion
+            </Button>
+          ) : (
+            <RequestActions request={request} onStatusChange={onStatusChange} />
+          )}
+        </Stack>
+      </Box>
     </Paper>
   );
 }
@@ -366,6 +621,21 @@ export function PickerRequestsBoard({
     );
   }
 
+  if (view === 'active' || view === 'receipt') {
+    return (
+      <Stack spacing={1}>
+        {requests.map((request) => (
+          <RequestRow
+            key={request.id}
+            request={request}
+            view={view}
+            onStatusChange={onStatusChange}
+          />
+        ))}
+      </Stack>
+    );
+  }
+
   return (
     <Box
       sx={{
@@ -374,6 +644,9 @@ export function PickerRequestsBoard({
           xs: '1fr',
           lg: 'repeat(2, minmax(0, 1fr))',
           xl: 'repeat(3, minmax(0, 1fr))',
+        },
+        '@media (min-width: 1900px)': {
+          gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
         },
         gap: 2,
       }}

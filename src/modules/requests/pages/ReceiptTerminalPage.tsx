@@ -73,7 +73,7 @@ export function ReceiptTerminalPage() {
     ),
   });
 
-  async function handleReceiptConfirm(pin: string, comment: string) {
+  async function handleReceiptConfirm(pin: string) {
     if (!selectedRequest) {
       return;
     }
@@ -84,7 +84,6 @@ export function ReceiptTerminalPage() {
       await confirmRequestReceipt({
         requestId: selectedRequest.id,
         pin,
-        comment,
       });
       setSnackbar('Pedido completo confirmado con NIP.');
       setSelectedRequest(null);
