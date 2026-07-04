@@ -14,6 +14,7 @@ type RequestStatusDialogProps = {
   request: RequestRow | null;
   nextStatus: RequestStatus | null;
   isSaving: boolean;
+  disablePortal?: boolean;
   onClose: () => void;
   onConfirm: (comment: string, pickerEmployeeNumber: string) => Promise<void>;
 };
@@ -22,6 +23,7 @@ export function RequestStatusDialog({
   request,
   nextStatus,
   isSaving,
+  disablePortal = false,
   onClose,
   onConfirm,
 }: RequestStatusDialogProps) {
@@ -44,7 +46,13 @@ export function RequestStatusDialog({
   }
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="sm">
+    <Dialog
+      open={isOpen}
+      onClose={handleClose}
+      fullWidth
+      maxWidth="sm"
+      disablePortal={disablePortal}
+    >
       <DialogTitle>Cambiar estado</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ pt: 1 }}>

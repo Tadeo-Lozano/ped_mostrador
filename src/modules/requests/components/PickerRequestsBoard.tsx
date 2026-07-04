@@ -411,135 +411,264 @@ function RequestRow({
           display: 'grid',
           gridTemplateColumns: {
             xs: '1fr',
-            md: '150px minmax(160px, 0.75fr) minmax(300px, 2fr)',
-            lg: '170px minmax(180px, 0.8fr) minmax(360px, 2.2fr) minmax(260px, auto)',
+            lg: isReceipt
+              ? '170px minmax(180px, 0.8fr) minmax(360px, 2.2fr) minmax(260px, auto)'
+              : 'minmax(0, 1fr) minmax(260px, auto)',
           },
           alignItems: 'stretch',
         }}
       >
-        <Box
-          sx={{
-            bgcolor: isReceipt
-              ? requesterColor.border
-              : request.priority === 'critica'
-                ? 'error.main'
-                : 'grey.900',
-            color: 'common.white',
-            px: 1.5,
-            py: 1.25,
-          }}
-        >
-          <Typography
-            variant="overline"
-            sx={{ display: 'block', fontSize: 10, lineHeight: 1.2, opacity: 0.8 }}
-          >
-            Pedido #{getRequestNumber(request.id)}
-          </Typography>
-          <Typography sx={{ fontSize: 20, fontWeight: 900, lineHeight: 1.1 }}>
-            {items.length === 1 ? items[0].part_code : `${items.length} productos`}
-          </Typography>
-          <Typography sx={{ mt: 0.5, fontSize: 14, fontWeight: 800 }}>
-            Total: {items.reduce((total, item) => total + item.quantity, 0)}
-          </Typography>
-          <Typography sx={{ mt: 0.5, fontSize: 12, opacity: 0.85 }}>
-            {formatTime(request.created_at)}
-          </Typography>
-        </Box>
-
-        <Stack
-          spacing={0.75}
-          sx={{
-            borderRight: { md: '1px solid' },
-            borderColor: { md: 'divider' },
-            px: 1.5,
-            py: 1.25,
-          }}
-        >
-          <Box
-            sx={{
-              borderLeft: '5px solid',
-              borderColor: requesterColor.border,
-              bgcolor: requesterColor.background,
-              color: requesterColor.text,
-              px: 1,
-              py: 0.75,
-            }}
-          >
-            <Typography sx={{ fontSize: 11, fontWeight: 700 }}>
-              Solicitante
-            </Typography>
-            <Typography sx={{ fontSize: 18, fontWeight: 900, lineHeight: 1.15 }}>
-              {request.requester?.full_name ?? '-'}
-            </Typography>
-          </Box>
-
-          <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
-            <RequestStatusChip status={request.status} />
-            <RequestPriorityChip priority={request.priority} />
-          </Stack>
-
-          {request.picker_employee_number && (
-            <Typography sx={{ fontSize: 12, fontWeight: 800 }}>
-              Surtidor: #{request.picker_employee_number}
-            </Typography>
-          )}
-        </Stack>
-
-        <Stack
-          spacing={0.5}
-          sx={{
-            borderRight: { lg: '1px solid' },
-            borderColor: { lg: 'divider' },
-            px: 1.5,
-            py: 1.25,
-          }}
-        >
-          {items.map((item) => (
+        {isReceipt ? (
+          <>
             <Box
-              key={item.id}
               sx={{
-                display: 'grid',
-                gridTemplateColumns: 'minmax(110px, 0.7fr) minmax(130px, 1.5fr) auto',
-                alignItems: 'center',
-                gap: 1,
-                borderBottom: '1px solid',
-                borderColor: 'divider',
-                pb: 0.5,
-                '&:last-of-type': { borderBottom: 0, pb: 0 },
+                bgcolor: requesterColor.border,
+                color: 'common.white',
+                px: 1.5,
+                py: 1.25,
               }}
             >
-              <Typography sx={{ fontSize: 16, fontWeight: 900 }}>
-                {item.part_code}
+              <Typography
+                variant="overline"
+                sx={{
+                  display: 'block',
+                  fontSize: 10,
+                  lineHeight: 1.2,
+                  opacity: 0.8,
+                }}
+              >
+                Pedido #{getRequestNumber(request.id)}
               </Typography>
-              <Box>
-                <Typography
-                  color="text.secondary"
-                  sx={{ fontSize: 12, fontWeight: 700, lineHeight: 1.2 }}
-                >
-                  {item.part_description ?? 'Sin descripcion'}
-                </Typography>
-                <Typography
-                  color="text.secondary"
-                  sx={{ fontSize: 11, fontWeight: 800 }}
-                >
-                  {WAREHOUSE_LABELS[item.warehouse_location]}
-                </Typography>
-              </Box>
-              <Typography sx={{ fontSize: 17, fontWeight: 900 }}>
-                x{item.quantity}
+              <Typography sx={{ fontSize: 20, fontWeight: 900, lineHeight: 1.1 }}>
+                {items.length === 1
+                  ? items[0].part_code
+                  : `${items.length} productos`}
+              </Typography>
+              <Typography sx={{ mt: 0.5, fontSize: 14, fontWeight: 800 }}>
+                Total: {items.reduce((total, item) => total + item.quantity, 0)}
+              </Typography>
+              <Typography sx={{ mt: 0.5, fontSize: 12, opacity: 0.85 }}>
+                {formatTime(request.created_at)}
               </Typography>
             </Box>
-          ))}
 
-          {request.notes && (
-            <Typography
-              color="text.secondary"
-              sx={{ pt: 0.5, fontSize: 12, fontWeight: 700 }}
+            <Stack
+              spacing={0.75}
+              sx={{
+                borderRight: { lg: '1px solid' },
+                borderColor: { lg: 'divider' },
+                px: 1.5,
+                py: 1.25,
+              }}
             >
-              Nota: {request.notes}
-            </Typography>
-          )}
-        </Stack>
+              <Box
+                sx={{
+                  borderLeft: '5px solid',
+                  borderColor: requesterColor.border,
+                  bgcolor: requesterColor.background,
+                  color: requesterColor.text,
+                  px: 1,
+                  py: 0.75,
+                }}
+              >
+                <Typography sx={{ fontSize: 11, fontWeight: 700 }}>
+                  Solicitante
+                </Typography>
+                <Typography
+                  sx={{ fontSize: 18, fontWeight: 900, lineHeight: 1.15 }}
+                >
+                  {request.requester?.full_name ?? '-'}
+                </Typography>
+              </Box>
+
+              <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
+                <RequestStatusChip status={request.status} />
+                <RequestPriorityChip priority={request.priority} />
+              </Stack>
+            </Stack>
+
+            <Stack
+              spacing={0.5}
+              sx={{
+                borderRight: { lg: '1px solid' },
+                borderColor: { lg: 'divider' },
+                px: 1.5,
+                py: 1.25,
+              }}
+            >
+              {items.map((item) => (
+                <Box
+                  key={item.id}
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns:
+                      'minmax(110px, 0.7fr) minmax(130px, 1.5fr) auto',
+                    alignItems: 'center',
+                    gap: 1,
+                  }}
+                >
+                  <Typography sx={{ fontSize: 18, fontWeight: 900 }}>
+                    {item.part_code}
+                  </Typography>
+                  <Box>
+                    <Typography
+                      color="text.secondary"
+                      sx={{ fontSize: 12, fontWeight: 700 }}
+                    >
+                      {item.part_description ?? 'Sin descripcion'}
+                    </Typography>
+                    <Typography
+                      color="text.secondary"
+                      sx={{ fontSize: 11, fontWeight: 800 }}
+                    >
+                      {WAREHOUSE_LABELS[item.warehouse_location]}
+                    </Typography>
+                  </Box>
+                  <Typography sx={{ fontSize: 17, fontWeight: 900 }}>
+                    x{item.quantity}
+                  </Typography>
+                </Box>
+              ))}
+            </Stack>
+          </>
+        ) : (
+          <Stack
+            spacing={0}
+            sx={{
+              borderRight: { lg: '1px solid' },
+              borderColor: { lg: 'divider' },
+            }}
+          >
+            {items.map((item, index) => (
+              <Box
+                key={item.id}
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: {
+                    xs: '1fr',
+                    md: 'minmax(320px, 1.4fr) minmax(280px, 0.8fr)',
+                  },
+                  minHeight: { md: 132 },
+                  borderBottom:
+                    index < items.length - 1 ? '1px solid' : undefined,
+                  borderColor: 'divider',
+                }}
+              >
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    bgcolor:
+                      request.priority === 'critica' ? 'error.main' : 'grey.900',
+                    color: 'common.white',
+                    minWidth: 0,
+                    px: { xs: 2, md: 3 },
+                    py: 2,
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      width: '100%',
+                      fontSize: { xs: 36, md: 48, xl: 58 },
+                      fontWeight: 900,
+                      lineHeight: 1,
+                      overflowWrap: 'anywhere',
+                    }}
+                  >
+                    {item.part_code}
+                  </Typography>
+                </Box>
+
+                <Stack
+                  justifyContent="center"
+                  spacing={0.75}
+                  sx={{ minWidth: 0, px: 2, py: 1.5 }}
+                >
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="flex-start"
+                    spacing={2}
+                  >
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography
+                        color="text.secondary"
+                        sx={{ fontSize: 11, fontWeight: 800 }}
+                      >
+                        Descripcion
+                      </Typography>
+                      <Typography
+                        sx={{ fontSize: 16, fontWeight: 800, lineHeight: 1.2 }}
+                      >
+                        {item.part_description ?? 'Sin descripcion'}
+                      </Typography>
+                      <Typography
+                        color="text.secondary"
+                        sx={{ mt: 0.5, fontSize: 12, fontWeight: 800 }}
+                      >
+                        {WAREHOUSE_LABELS[item.warehouse_location]}
+                      </Typography>
+                    </Box>
+                    <Typography sx={{ fontSize: 28, fontWeight: 900 }}>
+                      x{item.quantity}
+                    </Typography>
+                  </Stack>
+
+                  {index === 0 && (
+                    <>
+                      <Box
+                        sx={{
+                          borderLeft: '5px solid',
+                          borderColor: requesterColor.border,
+                          bgcolor: requesterColor.background,
+                          color: requesterColor.text,
+                          px: 1,
+                          py: 0.5,
+                        }}
+                      >
+                        <Typography sx={{ fontSize: 11, fontWeight: 700 }}>
+                          Solicitante
+                        </Typography>
+                        <Typography
+                          sx={{ fontSize: 18, fontWeight: 900, lineHeight: 1.1 }}
+                        >
+                          {request.requester?.full_name ?? '-'}
+                        </Typography>
+                      </Box>
+
+                      <Stack
+                        direction="row"
+                        alignItems="center"
+                        spacing={0.75}
+                        flexWrap="wrap"
+                        useFlexGap
+                      >
+                        <RequestStatusChip status={request.status} />
+                        <RequestPriorityChip priority={request.priority} />
+                        <Typography
+                          color="text.secondary"
+                          sx={{ fontSize: 11, fontWeight: 800 }}
+                        >
+                          Pedido #{getRequestNumber(request.id)} ·{' '}
+                          {formatTime(request.created_at)}
+                        </Typography>
+                      </Stack>
+                    </>
+                  )}
+                </Stack>
+              </Box>
+            ))}
+
+            {request.notes && (
+              <Typography
+                color="text.secondary"
+                sx={{ borderTop: '1px solid', borderColor: 'divider', p: 1.25 }}
+              >
+                Nota: {request.notes}
+              </Typography>
+            )}
+          </Stack>
+        )}
 
         <Stack
           justifyContent="center"

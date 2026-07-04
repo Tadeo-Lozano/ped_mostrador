@@ -6,8 +6,17 @@ import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import FullscreenExitOutlinedIcon from '@mui/icons-material/FullscreenExitOutlined';
+import FullscreenOutlinedIcon from '@mui/icons-material/FullscreenOutlined';
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
-import { useCallback, useMemo, useState, type MouseEvent } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type MouseEvent,
+} from 'react';
 
 import { useAuth } from '@/modules/auth/hooks/useAuth';
 import { PickerRequestsBoard } from '../components/PickerRequestsBoard';
@@ -39,7 +48,9 @@ export function PendingRequestsPage() {
     useState<RequestWithRequester | null>(null);
   const [nextStatus, setNextStatus] = useState<RequestStatus | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [snackbar, setSnackbar] = useState<string | null>(null);
+  const boardRef = useRef<HTMLDivElement | null>(null);
   const scope = useMemo(() => ({ type: 'operational' as const }), []);
 
   const effectiveFilters = {
@@ -71,6 +82,31 @@ export function PendingRequestsPage() {
       [refresh],
     ),
   });
+
+  useEffect(() => {
+    function handleFullscreenChange() {
+      setIsFullscreen(document.fullscreenElement === boardRef.current);
+    }
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
+  async function toggleFullscreen() {
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+        return;
+      }
+
+      await boardRef.current?.requestFullscreen();
+    } catch {
+      setSnackbar('No se pudo activar la pantalla completa.');
+    }
+  }
 
   function handleViewChange(
     _event: MouseEvent<HTMLElement>,
@@ -171,62 +207,113 @@ export function PendingRequestsPage() {
           >
             Actualizar
           </Button>
+
+          <Button
+            variant="contained"
+            size="large"
+            startIcon={<FullscreenOutlinedIcon />}
+            onClick={() => void toggleFullscreen()}
+          >
+            Pantalla completa
+          </Button>
         </Stack>
       </Stack>
 
       <Box
+        ref={boardRef}
         sx={{
-          border: '1px solid',
-          borderColor: 'divider',
-          borderRadius: 2,
-          bgcolor: 'background.paper',
-          px: 2.5,
-          py: 2,
+          bgcolor: isFullscreen ? 'grey.100' : 'transparent',
+          minHeight: isFullscreen ? '100vh' : 'auto',
+          overflowY: isFullscreen ? 'auto' : 'visible',
+          p: isFullscreen ? 2 : 0,
         }}
       >
-        <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          justifyContent="space-between"
-          spacing={1}
+        <Box
+          sx={{
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: 2,
+            bgcolor: 'background.paper',
+            px: 2.5,
+            py: 2,
+            mb: 2,
+          }}
         >
-          <Typography sx={{ fontSize: 20, fontWeight: 800 }}>
-            {filters.statusGroup === 'closed'
-              ? 'Pedidos anteriores'
-              : 'Pedidos abiertos y en proceso'}
-          </Typography>
-          <Typography color="text.secondary" sx={{ fontSize: 18, fontWeight: 700 }}>
-            {count} pedidos
-          </Typography>
-        </Stack>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            justifyContent="space-between"
+            alignItems={{ xs: 'stretch', sm: 'center' }}
+            spacing={1}
+          >
+            <Box>
+              <Typography sx={{ fontSize: isFullscreen ? 26 : 20, fontWeight: 900 }}>
+                {filters.statusGroup === 'closed'
+                  ? 'Pedidos anteriores'
+                  : 'Pedidos abiertos y en proceso'}
+              </Typography>
+              {isFullscreen && (
+                <Typography color="text.secondary" fontWeight={700}>
+                  {profile?.warehouse_location
+                    ? `Almacen ${profile.warehouse_location}`
+                    : 'Pantalla de almacen'}
+                </Typography>
+              )}
+            </Box>
+
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Typography
+                color="text.secondary"
+                sx={{ fontSize: isFullscreen ? 22 : 18, fontWeight: 800 }}
+              >
+                {count} pedidos
+              </Typography>
+
+              {isFullscreen && (
+                <Button
+                  variant="outlined"
+                  startIcon={<FullscreenExitOutlinedIcon />}
+                  onClick={() => void toggleFullscreen()}
+                >
+                  Salir
+                </Button>
+              )}
+            </Stack>
+          </Stack>
+        </Box>
+
+        {realtime.error && (
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            {realtime.error}
+          </Alert>
+        )}
+
+        <PickerRequestsBoard
+          requests={requests}
+          isLoading={isLoading}
+          error={error}
+          view={filters.statusGroup ?? 'active'}
+          onStatusChange={openStatusDialog}
+        />
+
+        <RequestStatusDialog
+          request={selectedRequest}
+          nextStatus={nextStatus}
+          isSaving={isSaving}
+          disablePortal={isFullscreen}
+          onClose={() => {
+            setSelectedRequest(null);
+            setNextStatus(null);
+          }}
+          onConfirm={handleConfirm}
+        />
+
+        <Snackbar
+          open={Boolean(snackbar)}
+          autoHideDuration={3000}
+          onClose={() => setSnackbar(null)}
+          message={snackbar}
+        />
       </Box>
-
-      {realtime.error && <Alert severity="warning">{realtime.error}</Alert>}
-
-      <PickerRequestsBoard
-        requests={requests}
-        isLoading={isLoading}
-        error={error}
-        view={filters.statusGroup ?? 'active'}
-        onStatusChange={openStatusDialog}
-      />
-
-      <RequestStatusDialog
-        request={selectedRequest}
-        nextStatus={nextStatus}
-        isSaving={isSaving}
-        onClose={() => {
-          setSelectedRequest(null);
-          setNextStatus(null);
-        }}
-        onConfirm={handleConfirm}
-      />
-
-      <Snackbar
-        open={Boolean(snackbar)}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar(null)}
-        message={snackbar}
-      />
     </Stack>
   );
 }
